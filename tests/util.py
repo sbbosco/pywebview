@@ -13,7 +13,14 @@ logger = logging.getLogger('pywebview')
 
 
 def run_test(webview, window, thread_func=None, param=None, start_args={}, no_destroy=False, destroy_delay=0):
+    
+    if 'block' not in start_args:
+        try:
+            start_args['block'] = not multiprocessing
+        except:pass
+        
     __tracebackhide__ = True
+    
     try:
         queue = Queue()
 

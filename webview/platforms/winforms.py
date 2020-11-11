@@ -460,6 +460,28 @@ def _allow_localhost():
 _main_window_created = Event()
 _main_window_created.clear()
 
+
+class Process(object):
+    name = Name
+    alive = None
+    daemon = False
+    pid = None
+    exitcode = None
+    authkey = b''
+    sentinel = None
+    kill = None
+    join = None
+    
+    def is_alive(self):
+        return self.alive
+    
+    def terminate(self):
+        self.kill()
+        
+    def close(self):
+        self.kill()
+
+
 def create_window(window):
     def create():
         browser = BrowserView.BrowserForm(window)
@@ -490,7 +512,15 @@ def create_window(window):
         thread = Thread(ThreadStart(create))
         thread.SetApartmentState(ApartmentState.STA)
         thread.Start()
-        thread.Join()
+        if not _multiprocessing:
+            thread.Join()
+        else:
+            p = Process()
+            p.join = thread.Join
+            p.is_alive = thread.IsAlive
+            p.name = thread.Name
+            p.kill = thread.Abort
+            return thread
 
     else:
         _main_window_created.wait()

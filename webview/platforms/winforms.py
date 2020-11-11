@@ -18,7 +18,7 @@ from threading import Event, Semaphore
 from ctypes import windll
 from uuid import uuid4
 
-from webview import WebViewException, windows, OPEN_DIALOG, FOLDER_DIALOG, SAVE_DIALOG, _debug
+from webview import WebViewException, windows, OPEN_DIALOG, FOLDER_DIALOG, SAVE_DIALOG, _debug, _user_agent, _multiprocessing
 from webview.guilib import forced_gui_
 from webview.util import parse_file_type, inject_base_uri
 from webview.js import alert

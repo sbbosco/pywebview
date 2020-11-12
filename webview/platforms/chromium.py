@@ -16,6 +16,7 @@ import tempfile
 import webbrowser
 from threading import Event, Semaphore
 from ctypes import windll
+from platform import architecture
 
 from webview import WebViewException, _debug, _user_agent
 from webview.serving import resolve_url
@@ -35,9 +36,11 @@ from System import IntPtr, Int32, String, Action, Func, Type, Environment, Uri
 from System.Threading.Tasks import Task, TaskScheduler, TaskContinuationOptions
 from System.Drawing import Size, Point, Icon, Color, ColorTranslator, SizeF
 
+archpath = 'x64' if architecture()[0] == '64bit' else 'x86'
+os.environ['Path'] = interop_dll_path(archpath) + ';' + os.environ['Path']
 clr.AddReference(interop_dll_path('Microsoft.Web.WebView2.Core.dll'))
 clr.AddReference(interop_dll_path('Microsoft.Web.WebView2.WinForms.dll'))
-from Microsoft.Web.WebView2.WinForms import WebView2
+from Microsoft.Web.WebView2.WinForms import WebView2, CoreWebView2CreationProperties
 from Microsoft.Web.WebView2.Core import CoreWebView2Environment
 
 logger = logging.getLogger('pywebview')
@@ -46,7 +49,10 @@ class EdgeChrome:
     def __init__(self, form, window):
         self.pywebview_window = window
         self.web_view = WebView2()
-
+        props = CoreWebView2CreationProperties()
+        #props.UserDataFolder = os.path.join(os.getcwd(), 'profile')
+        props.UserDataFolder = os.path.join(os.environ['LOCALAPPDATA'], 'pywebview')
+        self.web_view.CreationProperties = props
         form.Controls.Add(self.web_view)
 
         self.js_result_semaphore = Semaphore(0)

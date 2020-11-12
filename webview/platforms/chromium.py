@@ -78,16 +78,21 @@ class EdgeChrome:
         else:
             self.load_html(default_html, '')
 
-    def evaluate_js(self, script):
-        def callback(result):
-            self.js_result = None if result is None or result == '' else json.loads(result)
-            self.js_result_semaphore.release()
+    def evaluate_js(self, script, callback=None):
+        def _callback(result):
+            if callback is None:
+                self.js_result = None if result is None or result == '' else json.loads(result)
+                self.js_result_semaphore.release()
+            else: 
+                callback(result)
+                self.js_result = None
+                self.js_result_semaphore.release()
 
         self.syncContextTaskScheduler = TaskScheduler.FromCurrentSynchronizationContext()
         try:
             result = self.web_view.ExecuteScriptAsync(script).ContinueWith(
             Action[Task[String]](
-                lambda task: callback(json.loads(task.Result))
+                lambda task: _callback(json.loads(task.Result))
             ),
             self.syncContextTaskScheduler)
         except Exception as e:

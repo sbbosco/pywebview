@@ -462,7 +462,7 @@ _main_window_created.clear()
 
 
 class Process(object):
-    name = Name
+    name = 'fake'
     alive = None
     daemon = False
     pid = None

@@ -134,7 +134,7 @@ elif is_edge:
     logger.debug('Using WinForms / EdgeHTML')
     renderer = 'edgehtml'
 elif is_chromium:
-    from . import chromium as Chromium
+    from . import edgechromium as Chromium
     IWebBrowserInterop = object
     
     logger.debug('Using WinForms / Chromium')
